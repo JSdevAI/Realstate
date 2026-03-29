@@ -42,8 +42,8 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
         const target = targetFrameIndexRef.current;
         const current = currentFrameIndexRef.current;
         
-        // Linear interpolation factor (0.1 = slow/smooth, 1.0 = instant)
-        const lerpFactor = 0.08; 
+        // Slightly faster lerp for snappier feel
+        const lerpFactor = 0.15; 
         const next = current + (target - current) * lerpFactor;
         
         if (Math.abs(next - current) > 0.01) {
@@ -138,7 +138,7 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   return (
     <div 
       ref={containerRef} 
-      className={`relative w-full bg-black ${isMobile ? 'h-[800vh]' : 'h-[250vh]'}`}
+      className={`relative w-full bg-black ${isMobile ? 'h-[600vh]' : 'h-[250vh]'}`}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         
