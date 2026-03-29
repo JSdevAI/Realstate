@@ -76,10 +76,12 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
             key={src}
             src={src}
             alt={`Hero Frame ${index + 1}`}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-0 ${
-              index === frameIndex ? 'opacity-100 z-0' : 'opacity-0 -z-10'
-            }`}
-            // Hide broken images if they fail to load
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-0"
+            style={{ 
+              opacity: index === frameIndex ? 1 : 0, 
+              zIndex: index === frameIndex ? 0 : -10,
+              display: Math.abs(index - frameIndex) > 5 ? 'none' : 'block' // Optimization: hide distant frames
+            }}
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}

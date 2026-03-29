@@ -9,13 +9,13 @@ export const AboutSection = () => {
             <div className="absolute -top-6 -left-6 w-32 h-32 bg-tertiary-fixed-dim rounded-full mix-blend-multiply opacity-20 filter blur-3xl"></div>
             <img 
               className="rounded-lg shadow-2xl relative z-10 w-full object-cover aspect-[4/5]" 
+              src="https://lh3.googleusercontent.com/aida/ADBb0ui77uAPYrP6hQu_rDFO9L3U_L0FyJof88rnV_gD1_HhPgD3HNOayefdGaIjx3SlJRlgVkjI2i1W7dPxs71EtLI2CfQqOvSgvjHymusM8icKezCM64sqeIp9WbxpTiEFPbOxhoVb6XXaW6jK0BYWeiNAShAyZQs7qYVmIKk3nFuUFkJ0GA6TCDV3dGfkCJ69FOlqkS4Y5v9BDYlz8z28bPdHIG4ySKe00tfPnVs3hRt_vRG6TDX5o6r5rw8hR7uwf37-0TGPq56QrQ" 
               alt="André Araújo" 
-              src="https://lh3.googleusercontent.com/aida/ADBb0ui77uAPYrP6hQu_rDFO9L3U_L0FyJof88rnV_gD1_HhPgD3HNOayefdGaIjx3SlJRlgVkjI2i1W7dPxs71EtLI2CfQqOvSgvjHymusM8icKezCM64sqeIp9WbxpTiEFPbOxhoVb6XXaW6jK0BYWeiNAShAyZQs7qYVmIKk3nFuUFkJ0GA6TCDV3dGfkCJ69FOlqkS4Y5v9BDYlz8z28bPdHIG4ySKe00tfPnVs3hRt_vRG6TDX5o6r5rw8hR7uwf37-0TGPq56QrQ"
             />
             <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-primary-container rounded-full mix-blend-multiply opacity-10 filter blur-3xl"></div>
           </div>
           <div className="w-full lg:w-7/12 space-y-8">
-            <span className="text-on-tertiary-container font-bold tracking-widest uppercase text-xs font-label">O Consultor</span>
+            <span className="text-on-tertiary-container font-bold tracking-widest uppercase text-xs">O Consultor</span>
             <h2 className="font-headline text-4xl md:text-5xl font-extrabold text-primary-container leading-tight">
               A transparência é o alicerce de cada negócio.
             </h2>
@@ -25,19 +25,19 @@ export const AboutSection = () => {
             <ul className="space-y-4">
               <li className="flex items-center gap-4 text-on-surface">
                 <span className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
-                  <span className="material-symbols-outlined text-sm text-on-secondary-container" style={{fontVariationSettings: "'FILL' 1"}}>check_circle</span>
+                  <span className="material-symbols-outlined text-sm text-on-secondary-container">check_circle</span>
                 </span>
                 <span className="font-semibold">Informação clara em cada etapa.</span>
               </li>
               <li className="flex items-center gap-4 text-on-surface">
                 <span className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
-                  <span className="material-symbols-outlined text-sm text-on-secondary-container" style={{fontVariationSettings: "'FILL' 1"}}>check_circle</span>
+                  <span className="material-symbols-outlined text-sm text-on-secondary-container">check_circle</span>
                 </span>
                 <span className="font-semibold">Processos simples e organizados.</span>
               </li>
               <li className="flex items-center gap-4 text-on-surface">
                 <span className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
-                  <span className="material-symbols-outlined text-sm text-on-secondary-container" style={{fontVariationSettings: "'FILL' 1"}}>check_circle</span>
+                  <span className="material-symbols-outlined text-sm text-on-secondary-container">check_circle</span>
                 </span>
                 <span className="font-semibold">Acompanhamento próximo até à escritura.</span>
               </li>
