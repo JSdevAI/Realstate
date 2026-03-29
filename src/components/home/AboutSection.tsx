@@ -1,4 +1,4 @@
-import React from 'react';
+import Image from 'next/image';
 
 export const AboutSection = () => {
   return (
@@ -7,10 +7,13 @@ export const AboutSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-16">
           <div className="w-full lg:w-5/12 relative">
             <div className="absolute -top-6 -left-6 w-32 h-32 bg-tertiary-fixed-dim rounded-full mix-blend-multiply opacity-20 filter blur-3xl"></div>
-            <img 
+            <Image 
               className="rounded-lg shadow-2xl relative z-10 w-full object-cover aspect-[4/5]" 
               src="https://lh3.googleusercontent.com/aida/ADBb0ui77uAPYrP6hQu_rDFO9L3U_L0FyJof88rnV_gD1_HhPgD3HNOayefdGaIjx3SlJRlgVkjI2i1W7dPxs71EtLI2CfQqOvSgvjHymusM8icKezCM64sqeIp9WbxpTiEFPbOxhoVb6XXaW6jK0BYWeiNAShAyZQs7qYVmIKk3nFuUFkJ0GA6TCDV3dGfkCJ69FOlqkS4Y5v9BDYlz8z28bPdHIG4ySKe00tfPnVs3hRt_vRG6TDX5o6r5rw8hR7uwf37-0TGPq56QrQ" 
               alt="André Araújo" 
+              width={600}
+              height={750}
+              quality={100}
             />
             <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-primary-container rounded-full mix-blend-multiply opacity-10 filter blur-3xl"></div>
           </div>

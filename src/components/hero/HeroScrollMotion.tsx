@@ -56,37 +56,53 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [frames]);
 
-  // Preload first few frames to ensure smooth initial scroll
+  // Advanced Preloading: Load frames around the current index
   useEffect(() => {
     if (frames.length > 0) {
-      frames.slice(0, 10).forEach(src => {
+      // Preload next 10 frames from current point
+      const preloadWindow = 10;
+      for (let i = frameIndex; i < Math.min(frameIndex + preloadWindow, frames.length); i++) {
         const img = new Image();
-        img.src = src;
-      });
+        img.src = frames[i];
+      }
+      // Also preload a few previous just in case of fast scroll up
+      for (let i = Math.max(0, frameIndex - 3); i < frameIndex; i++) {
+        const img = new Image();
+        img.src = frames[i];
+      }
     }
-  }, [frames]);
+  }, [frameIndex, frames]);
+
+  // Virtualization window: how many frames to keep in DOM
+  const windowSize = 2; // Current + 2 before + 2 after = 5 frames total
+  const visibleFrames = frames.map((src, index) => {
+    const isVisible = Math.abs(index - frameIndex) <= windowSize;
+    if (!isVisible) return null;
+
+    return (
+      <img
+        key={src}
+        src={src}
+        alt={`Hero Frame ${index + 1}`}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ 
+          opacity: index === frameIndex ? 1 : 0, 
+          zIndex: index === frameIndex ? 1 : 0,
+          visibility: index === frameIndex ? 'visible' : 'hidden'
+        }}
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
+      />
+    );
+  });
 
   return (
     <div ref={containerRef} className="relative h-[250vh] w-full bg-black">
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         
-        {/* Background Frames */}
-        {frames.map((src, index) => (
-          <img
-            key={src}
-            src={src}
-            alt={`Hero Frame ${index + 1}`}
-            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-0"
-            style={{ 
-              opacity: index === frameIndex ? 1 : 0, 
-              zIndex: index === frameIndex ? 0 : -10,
-              display: Math.abs(index - frameIndex) > 5 ? 'none' : 'block' // Optimization: hide distant frames
-            }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        ))}
+        {/* Background Frames - Virtualized */}
+        {visibleFrames}
         
         {/* Subtle beige overlay */}
         <div className="absolute inset-0 bg-[#F5F5DC]/10 z-10"></div>

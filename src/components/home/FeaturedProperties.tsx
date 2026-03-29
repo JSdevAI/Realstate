@@ -1,4 +1,4 @@
-import React from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export const FeaturedProperties = () => {
@@ -54,12 +54,15 @@ export const FeaturedProperties = () => {
           {properties.map((prop) => (
             <div key={prop.id} className="group bg-surface-container-lowest rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
               <div className="relative h-72 overflow-hidden">
-                <img 
+                <Image 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                   src={prop.image} 
                   alt={prop.title} 
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  quality={90}
                 />
-                <span className={`absolute top-4 left-4 ${prop.statusColor} text-white px-4 py-1.5 rounded-full text-xs font-bold`}>
+                <span className={`absolute top-4 left-4 ${prop.statusColor} text-white px-4 py-1.5 rounded-full text-xs font-bold z-10`}>
                   {prop.status}
                 </span>
               </div>

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
 
@@ -51,10 +52,13 @@ export default function GalleryPage() {
           {filtered.map((prop) => (
             <div key={prop.id} className="group bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-white/50">
               <div className="relative h-72 overflow-hidden">
-                <img 
+                <Image 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
                   src={prop.img} 
                   alt={prop.title} 
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  quality={90}
                 />
               </div>
               <div className="p-8">
