@@ -19,6 +19,8 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   secondaryCta,
 }) => {
   const [frameIndex, setFrameIndex] = useState(0);
+  const targetFrameIndexRef = useRef(0);
+  const currentFrameIndexRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -31,51 +33,71 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
 
   const frames = isMobile ? framesMobile : framesDesktop;
 
+  // Smoothing Loop (Lerp) - Only active on mobile to absorb flick scrolls
   useEffect(() => {
-    let requestRef: number;
+    let rafId: number;
     
+    const smoothUpdate = () => {
+      if (isMobile) {
+        const target = targetFrameIndexRef.current;
+        const current = currentFrameIndexRef.current;
+        
+        // Linear interpolation factor (0.1 = slow/smooth, 1.0 = instant)
+        const lerpFactor = 0.08; 
+        const next = current + (target - current) * lerpFactor;
+        
+        if (Math.abs(next - current) > 0.01) {
+          currentFrameIndexRef.current = next;
+          setFrameIndex(Math.round(next));
+        }
+      } else {
+        // Desktop is snappy
+        if (currentFrameIndexRef.current !== targetFrameIndexRef.current) {
+          currentFrameIndexRef.current = targetFrameIndexRef.current;
+          setFrameIndex(Math.round(targetFrameIndexRef.current));
+        }
+      }
+      rafId = requestAnimationFrame(smoothUpdate);
+    };
+
+    rafId = requestAnimationFrame(smoothUpdate);
+    return () => cancelAnimationFrame(rafId);
+  }, [isMobile]);
+
+  useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current || frames.length === 0) return;
       
-      const updateFrame = () => {
-        const { top, height } = containerRef.current!.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const scrollableDistance = height - windowHeight;
-        let progress = -top / scrollableDistance;
-        progress = Math.max(0, Math.min(1, progress));
+      const { top, height } = containerRef.current!.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const scrollableDistance = height - windowHeight;
+      let progress = -top / scrollableDistance;
+      progress = Math.max(0, Math.min(1, progress));
 
-        const currentFrame = Math.min(
-          Math.floor(progress * frames.length),
-          frames.length - 1
-        );
-        
-        setFrameIndex(currentFrame);
-      };
-
-      // Performance optimization: use RAF for smooth updates on high-freq scroll events
-      cancelAnimationFrame(requestRef);
-      requestRef = requestAnimationFrame(updateFrame);
+      const targetFrame = Math.min(
+        Math.floor(progress * frames.length),
+        frames.length - 1
+      );
+      
+      targetFrameIndexRef.current = targetFrame;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      cancelAnimationFrame(requestRef);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [frames]);
 
   // Advanced Preloading: Load frames around the current index
   useEffect(() => {
     if (frames.length > 0) {
       // Preload next 10 frames from current point
-      const preloadWindow = 10;
+      const preloadWindow = 15;
       for (let i = frameIndex; i < Math.min(frameIndex + preloadWindow, frames.length); i++) {
         const img = new Image();
         img.src = frames[i];
       }
       // Also preload a few previous just in case of fast scroll up
-      for (let i = Math.max(0, frameIndex - 3); i < frameIndex; i++) {
+      for (let i = Math.max(0, frameIndex - 5); i < frameIndex; i++) {
         const img = new Image();
         img.src = frames[i];
       }
@@ -83,7 +105,7 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   }, [frameIndex, frames]);
 
   // Virtualization window: how many frames to keep in DOM
-  const windowSize = isMobile ? 4 : 2; // Increased buffer for mobile to prevent flashing
+  const windowSize = isMobile ? 5 : 2; 
   const visibleFrames = frames.map((src, index) => {
     const isVisible = Math.abs(index - frameIndex) <= windowSize;
     if (!isVisible) return null;
@@ -100,9 +122,9 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
         // @ts-ignore - fetchPriority is supported in modern browsers but not yet in all TS types
         fetchPriority={isActive ? 'high' : 'auto'}
         style={{ 
-          opacity: (isActive || isNeighbor) ? 1 : 0, // Keep neighbor at 1 for solid backstop
-          zIndex: isActive ? 10 : (isNeighbor ? 5 : 0), // Layering Sandwich
-          transition: 'opacity 50ms linear', // Faster but smoother
+          opacity: (isActive || isNeighbor) ? 1 : 0, 
+          zIndex: isActive ? 10 : (isNeighbor ? 5 : 0), 
+          transition: isMobile ? 'none' : 'opacity 50ms linear', // No CSS transition on mobile if lerping
           objectPosition: isMobile ? '50% 35%' : 'center center',
           transform: `translateZ(0) ${isMobile ? 'scale(1.05)' : ''}`, // HW Acceleration
         }}
@@ -116,7 +138,7 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   return (
     <div 
       ref={containerRef} 
-      className={`relative w-full bg-black ${isMobile ? 'h-[450vh]' : 'h-[250vh]'}`}
+      className={`relative w-full bg-black ${isMobile ? 'h-[800vh]' : 'h-[250vh]'}`}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         

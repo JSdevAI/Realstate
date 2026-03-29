@@ -11,7 +11,7 @@ export const FeaturedProperties = () => {
       beds: '4 Quads',
       baths: '3 WCs',
       area: '320m²',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCug8VOrKRAhPUhloGqHBmoW4t55XPC_fcBWh88rvW-vYtGi0FusP0tGOfVqKEfBWTgoPcy7zOKTHzlyCXHqADdxtnbacWKkor157isYIcT2ky93z9YIEihb-6Mf30vQG22VKyMiehhbF2gq2aNubhb2i4WttGW-bnLEJqkX_-h6ZPo9SAiu3Y0f-I-SrcAEE0SGgYJ0612rTuErmEIQBArwFyYR2kl71AtSbywQo95BxdNiPSvYiXYh42oFY1Zy8q4bSGxRpvlKwnn',
+      image: '/properties/villa.png',
       status: 'Disponível',
       statusColor: 'bg-[#6FA49F]'
     },
@@ -23,7 +23,7 @@ export const FeaturedProperties = () => {
       beds: '3 Quads',
       baths: '2 WCs',
       area: '160m²',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBsmrGCOu4jkmrCUifjQf5g0TNzgm0K0frgPZcmkouVIvDdb5E-BcN4_crWyX6r9LGsVQc1iTNB-0QqN4wliBb4b2YnZCtSIshrVur-5LQtzknnJn_GIM2u-r088J4GM155u4-v6Ow6QZuulM8av_9tetebG4vv_QcLMkmda-jJ9st_4iVd0BNYx51AiGbqm9jooHGmzP1RvFc2tw7pZmnALM-xD8QPj_TAwAoD7Nz7Bdl8sTAd0RZ5G9OaRuDlUUIgzpEhMgOHdEF_',
+      image: '/properties/apartment.png',
       status: 'Reservado',
       statusColor: 'bg-[#D9A25F]'
     },
@@ -35,7 +35,7 @@ export const FeaturedProperties = () => {
       beds: '5 Quads',
       baths: '4 WCs',
       area: '450m²',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC10reTxqjYCvIqgwtHiAsr94nIBkFZiThJWWcjiysUoYhksaPNmo-bBHXDNQv3bHs8VQJnLZjg5DPKNmOdCCAgVDIy4VllVri6RaovatzJfQGq4Ra3BJ_ofn0lUo0vlaTzs0k5hyuy5RMsi7wPpZ6jjrdc7rAgKdxpr_9y5wf_MIKfHKMxDW1ovYlmJzJey8WYUmnaxjHhTEn-XntAzBQpvtDuhjPFQmtSmv9ImXhGpcTNsRFWFWd3PRgAs0Kfk_mk0WMgG12qDXCL',
+      image: '/properties/country_house.png',
       status: 'Vendido',
       statusColor: 'bg-[#0C2D48]/70'
     }
