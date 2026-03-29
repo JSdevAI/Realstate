@@ -114,7 +114,10 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   });
 
   return (
-    <div ref={containerRef} className="relative h-[250vh] w-full bg-black">
+    <div 
+      ref={containerRef} 
+      className={`relative w-full bg-black ${isMobile ? 'h-[450vh]' : 'h-[250vh]'}`}
+    >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         
         {/* Background Frames - Virtualized */}
