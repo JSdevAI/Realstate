@@ -32,28 +32,37 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   const frames = isMobile ? framesMobile : framesDesktop;
 
   useEffect(() => {
+    let requestRef: number;
+    
     const handleScroll = () => {
       if (!containerRef.current || frames.length === 0) return;
       
-      const { top, height } = containerRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      // Calculate progress (0 to 1) while the container is scrolling up
-      const scrollableDistance = height - windowHeight;
-      let progress = -top / scrollableDistance;
-      progress = Math.max(0, Math.min(1, progress));
+      const updateFrame = () => {
+        const { top, height } = containerRef.current!.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const scrollableDistance = height - windowHeight;
+        let progress = -top / scrollableDistance;
+        progress = Math.max(0, Math.min(1, progress));
 
-      const currentFrame = Math.min(
-        Math.floor(progress * frames.length),
-        frames.length - 1
-      );
-      
-      setFrameIndex(currentFrame);
+        const currentFrame = Math.min(
+          Math.floor(progress * frames.length),
+          frames.length - 1
+        );
+        
+        setFrameIndex(currentFrame);
+      };
+
+      // Performance optimization: use RAF for smooth updates on high-freq scroll events
+      cancelAnimationFrame(requestRef);
+      requestRef = requestAnimationFrame(updateFrame);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initialize on mount
-    return () => window.removeEventListener('scroll', handleScroll);
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(requestRef);
+    };
   }, [frames]);
 
   // Advanced Preloading: Load frames around the current index
@@ -84,11 +93,13 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
         key={src}
         src={src}
         alt={`Hero Frame ${index + 1}`}
-        className="absolute inset-0 w-full h-full object-cover"
+        className={`absolute inset-0 w-full h-full object-cover transition-none`}
         style={{ 
           opacity: index === frameIndex ? 1 : 0, 
           zIndex: index === frameIndex ? 1 : 0,
-          visibility: index === frameIndex ? 'visible' : 'hidden'
+          visibility: index === frameIndex ? 'visible' : 'hidden',
+          objectPosition: isMobile ? '50% 35%' : 'center center',
+          transform: `translateZ(0) ${isMobile ? 'scale(1.05)' : ''}`, // HW Acceleration + Zoom Out
         }}
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = 'none';
