@@ -1,17 +1,33 @@
-import React from 'react';
+import Image from 'next/image';
 
 export const ContactSection = () => {
   return (
     <section className="py-24 bg-surface" id="contacto">
       <div className="container mx-auto px-6 max-w-7xl">
         <div className="flex flex-col lg:flex-row gap-16">
-          <div className="w-full lg:w-4/12 space-y-8">
-            <span className="text-on-tertiary-container font-bold tracking-widest uppercase text-xs">VAMOS CONVERSAR?</span>
-            <h2 className="font-headline text-4xl md:text-5xl font-extrabold text-primary-container">Precisa de ajuda com o seu imóvel?</h2>
-            <p className="text-on-surface-variant font-medium text-lg leading-relaxed">
-              Estamos aqui para simplificar o seu processo imobiliário. Entre em contacto connosco e conte-nos como podemos ajudar.
-            </p>
-            <div className="space-y-6 pt-4">
+          <div className="w-full lg:w-4/12 space-y-10">
+            <div className="space-y-6">
+              <span className="text-on-tertiary-container font-bold tracking-widest uppercase text-xs">VAMOS CONVERSAR?</span>
+              <div className="flex items-center gap-6">
+                <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-2xl ring-4 ring-primary-container/10">
+                  <Image 
+                    src="/photo_andré_studio.png" 
+                    alt="André Araújo" 
+                    fill 
+                    className="object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-extrabold text-primary-container leading-none">André Araújo</h3>
+                  <p className="text-on-surface-variant font-bold text-sm mt-2 opacity-70">Consultor Imobiliário</p>
+                </div>
+              </div>
+              <h2 className="font-headline text-4xl font-extrabold text-primary-container leading-tight">Precisa de ajuda com o seu imóvel?</h2>
+              <p className="text-on-surface-variant font-medium text-lg leading-relaxed">
+                Estou aqui para simplificar o seu processo imobiliário. Conte-me como o posso ajudar.
+              </p>
+            </div>
+            <div className="space-y-6">
               <div className="flex items-center gap-6 group">
                 <div className="w-14 h-14 bg-surface-container-high rounded-full flex items-center justify-center group-hover:bg-primary-container group-hover:text-white transition-all duration-300">
                   <span className="material-symbols-outlined">call</span>
