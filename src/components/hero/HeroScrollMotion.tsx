@@ -83,23 +83,28 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   }, [frameIndex, frames]);
 
   // Virtualization window: how many frames to keep in DOM
-  const windowSize = 2; // Current + 2 before + 2 after = 5 frames total
+  const windowSize = isMobile ? 4 : 2; // Increased buffer for mobile to prevent flashing
   const visibleFrames = frames.map((src, index) => {
     const isVisible = Math.abs(index - frameIndex) <= windowSize;
     if (!isVisible) return null;
+
+    const isActive = index === frameIndex;
 
     return (
       <img
         key={src}
         src={src}
         alt={`Hero Frame ${index + 1}`}
-        className={`absolute inset-0 w-full h-full object-cover transition-none`}
+        className={`absolute inset-0 w-full h-full object-cover`}
+        // @ts-ignore - fetchPriority is supported in modern browsers but not yet in all TS types
+        fetchPriority={isActive ? 'high' : 'auto'}
         style={{ 
-          opacity: index === frameIndex ? 1 : 0, 
-          zIndex: index === frameIndex ? 1 : 0,
-          visibility: index === frameIndex ? 'visible' : 'hidden',
+          opacity: isActive ? 1 : 0, 
+          zIndex: isActive ? 1 : 0,
+          // Removed visibility: hidden to keep buffered frames in the compositor
+          transition: 'opacity 100ms linear', // Smooth cross-fade to hide paint gaps
           objectPosition: isMobile ? '50% 35%' : 'center center',
-          transform: `translateZ(0) ${isMobile ? 'scale(1.05)' : ''}`, // HW Acceleration + Zoom Out
+          transform: `translateZ(0) ${isMobile ? 'scale(1.05)' : ''}`, // HW Acceleration
         }}
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = 'none';
