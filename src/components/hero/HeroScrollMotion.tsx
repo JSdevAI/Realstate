@@ -89,6 +89,7 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
     if (!isVisible) return null;
 
     const isActive = index === frameIndex;
+    const isNeighbor = Math.abs(index - frameIndex) === 1; // Immediate neighbors for backstop
 
     return (
       <img
@@ -99,10 +100,9 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
         // @ts-ignore - fetchPriority is supported in modern browsers but not yet in all TS types
         fetchPriority={isActive ? 'high' : 'auto'}
         style={{ 
-          opacity: isActive ? 1 : 0, 
-          zIndex: isActive ? 1 : 0,
-          // Removed visibility: hidden to keep buffered frames in the compositor
-          transition: 'opacity 100ms linear', // Smooth cross-fade to hide paint gaps
+          opacity: (isActive || isNeighbor) ? 1 : 0, // Keep neighbor at 1 for solid backstop
+          zIndex: isActive ? 10 : (isNeighbor ? 5 : 0), // Layering Sandwich
+          transition: 'opacity 50ms linear', // Faster but smoother
           objectPosition: isMobile ? '50% 35%' : 'center center',
           transform: `translateZ(0) ${isMobile ? 'scale(1.05)' : ''}`, // HW Acceleration
         }}
@@ -120,8 +120,7 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
         {/* Background Frames - Virtualized */}
         {visibleFrames}
         
-        {/* Subtle beige overlay */}
-        <div className="absolute inset-0 bg-[#F5F5DC]/10 z-10"></div>
+        {/* Removed beige overlay that was causing brown flashes */}
 
         {/* Content Overlay */}
         <div className="absolute inset-0 z-20 flex items-center">
