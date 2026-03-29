@@ -18,9 +18,9 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   primaryCta,
   secondaryCta,
 }) => {
-  const [frameIndex, setFrameIndex] = useState(0);
-  const targetFrameIndexRef = useRef(0);
-  const currentFrameIndexRef = useRef(0);
+  const [progress, setProgress] = useState(0);
+  const targetProgressRef = useRef(0);
+  const currentProgressRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -38,24 +38,16 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
     let rafId: number;
     
     const smoothUpdate = () => {
-      if (isMobile) {
-        const target = targetFrameIndexRef.current;
-        const current = currentFrameIndexRef.current;
-        
-        // Slightly faster lerp for snappier feel
-        const lerpFactor = 0.15; 
-        const next = current + (target - current) * lerpFactor;
-        
-        if (Math.abs(next - current) > 0.01) {
-          currentFrameIndexRef.current = next;
-          setFrameIndex(Math.round(next));
-        }
-      } else {
-        // Desktop is snappy
-        if (currentFrameIndexRef.current !== targetFrameIndexRef.current) {
-          currentFrameIndexRef.current = targetFrameIndexRef.current;
-          setFrameIndex(Math.round(targetFrameIndexRef.current));
-        }
+      const target = targetProgressRef.current;
+      const current = currentProgressRef.current;
+      
+      // Snappier on desktop, smooth on mobile
+      const lerpFactor = isMobile ? 0.1 : 1.0; 
+      const next = current + (target - current) * lerpFactor;
+      
+      if (Math.abs(next - current) > 0.0001) {
+        currentProgressRef.current = next;
+        setProgress(next);
       }
       rafId = requestAnimationFrame(smoothUpdate);
     };
@@ -70,16 +62,11 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
       
       const { top, height } = containerRef.current!.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      const scrollableDistance = height - windowHeight;
-      let progress = -top / scrollableDistance;
-      progress = Math.max(0, Math.min(1, progress));
+      const totalDistance = height - windowHeight;
+      let rawProgress = -top / totalDistance;
+      rawProgress = Math.max(0, Math.min(1, rawProgress));
 
-      const targetFrame = Math.min(
-        Math.floor(progress * frames.length),
-        frames.length - 1
-      );
-      
-      targetFrameIndexRef.current = targetFrame;
+      targetProgressRef.current = rawProgress;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -87,16 +74,22 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [frames]);
 
-  // Advanced Preloading: Load frames around the current index
+  // Derive animation values
+  // Animation finishes at 85%, holding the last frame until the end
+  const frameProgress = Math.min(1, progress / 0.85);
+  const frameIndex = Math.min(Math.floor(frameProgress * frames.length), frames.length - 1);
+  
+  // Text fades out during the last 15% (holding phase)
+  const overlayOpacity = Math.max(0, 1 - (progress - 0.85) / 0.1); 
+
+  // Advanced Preloading
   useEffect(() => {
     if (frames.length > 0) {
-      // Preload next 10 frames from current point
       const preloadWindow = 15;
       for (let i = frameIndex; i < Math.min(frameIndex + preloadWindow, frames.length); i++) {
         const img = new Image();
         img.src = frames[i];
       }
-      // Also preload a few previous just in case of fast scroll up
       for (let i = Math.max(0, frameIndex - 5); i < frameIndex; i++) {
         const img = new Image();
         img.src = frames[i];
@@ -104,14 +97,14 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
     }
   }, [frameIndex, frames]);
 
-  // Virtualization window: how many frames to keep in DOM
+  // Virtualization window
   const windowSize = isMobile ? 5 : 2; 
   const visibleFrames = frames.map((src, index) => {
     const isVisible = Math.abs(index - frameIndex) <= windowSize;
     if (!isVisible) return null;
 
     const isActive = index === frameIndex;
-    const isNeighbor = Math.abs(index - frameIndex) === 1; // Immediate neighbors for backstop
+    const isNeighbor = Math.abs(index - frameIndex) === 1;
 
     return (
       <img
@@ -119,14 +112,14 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
         src={src}
         alt={`Hero Frame ${index + 1}`}
         className={`absolute inset-0 w-full h-full object-cover`}
-        // @ts-ignore - fetchPriority is supported in modern browsers but not yet in all TS types
+        // @ts-ignore
         fetchPriority={isActive ? 'high' : 'auto'}
         style={{ 
           opacity: (isActive || isNeighbor) ? 1 : 0, 
           zIndex: isActive ? 10 : (isNeighbor ? 5 : 0), 
-          transition: isMobile ? 'none' : 'opacity 50ms linear', // No CSS transition on mobile if lerping
+          transition: isMobile ? 'none' : 'opacity 50ms linear',
           objectPosition: isMobile ? '50% 35%' : 'center center',
-          transform: `translateZ(0) ${isMobile ? 'scale(1.05)' : ''}`, // HW Acceleration
+          transform: `translateZ(0) ${isMobile ? 'scale(1.05)' : ''}`,
         }}
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = 'none';
@@ -138,17 +131,22 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   return (
     <div 
       ref={containerRef} 
-      className={`relative w-full bg-black ${isMobile ? 'h-[600vh]' : 'h-[250vh]'}`}
+      className={`relative w-full bg-black ${isMobile ? 'h-[750vh]' : 'h-[350vh]'}`}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         
         {/* Background Frames - Virtualized */}
         {visibleFrames}
         
-        {/* Removed beige overlay that was causing brown flashes */}
-
-        {/* Content Overlay */}
-        <div className="absolute inset-0 z-20 flex items-center">
+        {/* Content Overlay - with dynamic fade-out */}
+        <div 
+          className="absolute inset-0 z-20 flex items-center"
+          style={{ 
+            opacity: overlayOpacity,
+            visibility: overlayOpacity === 0 ? 'hidden' : 'visible',
+            transition: 'opacity 50ms linear'
+          }}
+        >
           <div className="container mx-auto px-6">
             <div className="max-w-3xl text-center md:text-left pt-24">
               <h1 className="font-headline text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tighter drop-shadow-lg">
