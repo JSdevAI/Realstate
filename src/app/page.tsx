@@ -10,16 +10,11 @@ const Testimonials = dynamic(() => import('@/components/home/Testimonials').then
 const ContactSection = dynamic(() => import('@/components/home/ContactSection').then(mod => mod.ContactSection), { ssr: true });
 
 export default function Home() {
-  const framesDesktop = Array.from({ length: 72 }, (_, i) => `/hero/desktop/House_exterior_to_202603291831_${(i + 1).toString().padStart(3, '0')}.png`);
-  const framesMobile = framesDesktop; // Default to desktop if mobile folder missing
-
   return (
     <main className="min-h-screen">
       <Navbar />
       
-      <HeroScrollMotion 
-        framesDesktop={framesDesktop}
-        framesMobile={framesMobile}
+      <HeroScrollMotion
         headline="A Transparência é o Alicerce de cada Negócio"
         subheadline="Consultoria imobiliária dedicada em Vila Nova de Famalicão. Ajudamos proprietários e compradores a tomar decisões seguras e informadas."
         primaryCta={{ label: "Ver Imóveis", href: "#imoveis" }}

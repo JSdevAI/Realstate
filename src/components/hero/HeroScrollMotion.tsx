@@ -2,8 +2,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 type HeroScrollMotionProps = {
-  framesDesktop: string[];
-  framesMobile: string[];
   headline: string;
   subheadline: string;
   primaryCta: { label: string; href: string };
@@ -11,159 +9,162 @@ type HeroScrollMotionProps = {
 };
 
 export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
-  framesDesktop,
-  framesMobile,
   headline,
   subheadline,
   primaryCta,
   secondaryCta,
 }) => {
-  const [progress, setProgress] = useState(0);
-  const targetProgressRef = useRef(0);
-  const currentProgressRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [heroVisible, setHeroVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [gifReady, setGifReady] = useState(false);
 
+  const MOBILE_GIF = '/hero/hero-mobile.gif';
+  const MOBILE_PLACEHOLDER = '/hero/desktop/House_exterior_to_202603291831_001.png';
+
+  // Responsive check — only run on client
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const check = () => setIsMobile(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
-  const frames = isMobile ? framesMobile : framesDesktop;
-
-  // Smoothing Loop (Lerp) - Only active on mobile to absorb flick scrolls
+  // Mobile: show content overlay as soon as placeholder is visible
   useEffect(() => {
-    let rafId: number;
-    
-    const smoothUpdate = () => {
-      const target = targetProgressRef.current;
-      const current = currentProgressRef.current;
-      
-      // Snappier on desktop, smooth on mobile
-      const lerpFactor = isMobile ? 0.1 : 1.0; 
-      const next = current + (target - current) * lerpFactor;
-      
-      if (Math.abs(next - current) > 0.0001) {
-        currentProgressRef.current = next;
-        setProgress(next);
-      }
-      rafId = requestAnimationFrame(smoothUpdate);
-    };
-
-    rafId = requestAnimationFrame(smoothUpdate);
-    return () => cancelAnimationFrame(rafId);
+    if (isMobile) setHeroVisible(true);
   }, [isMobile]);
 
+  // Mobile: preload GIF fully before injecting into DOM
+  // This guarantees it always starts at frame 1 with no mid-cycle flash
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current || frames.length === 0) return;
-      
-      const { top, height } = containerRef.current!.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const totalDistance = height - windowHeight;
-      let rawProgress = -top / totalDistance;
-      rawProgress = Math.max(0, Math.min(1, rawProgress));
+    if (!isMobile) return;
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      if (!cancelled) setGifReady(true);
+    };
+    img.src = MOBILE_GIF;
+    return () => {
+      cancelled = true;
+    };
+  }, [isMobile]);
 
-      targetProgressRef.current = rawProgress;
+  // Visibility tracking (pause desktop video when off-screen)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Desktop: video ping-pong loop
+  useEffect(() => {
+    if (!isVisible || isMobile || !videoRef.current) return;
+
+    const video = videoRef.current;
+    let reverseId: number;
+
+    const tick = () => {
+      if (video.paused) video.play().catch(() => {});
+      if (video.currentTime >= video.duration - 0.2) {
+        video.pause();
+        const scrub = () => {
+          if (video.currentTime <= 0.1) {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+            return;
+          }
+          video.currentTime -= 0.1;
+          reverseId = requestAnimationFrame(scrub);
+        };
+        reverseId = requestAnimationFrame(scrub);
+      }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [frames]);
-
-  // Derive animation values
-  // Animation finishes at 85%, holding the last frame until the end
-  const frameProgress = Math.min(1, progress / 0.85);
-  const frameIndex = Math.min(Math.floor(frameProgress * frames.length), frames.length - 1);
-  
-  // Text fades out during the last 15% (holding phase)
-  const overlayOpacity = Math.max(0, 1 - (progress - 0.85) / 0.1); 
-
-  // Advanced Preloading
-  useEffect(() => {
-    if (frames.length > 0) {
-      const preloadWindow = 15;
-      for (let i = frameIndex; i < Math.min(frameIndex + preloadWindow, frames.length); i++) {
-        const img = new Image();
-        img.src = frames[i];
-      }
-      for (let i = Math.max(0, frameIndex - 5); i < frameIndex; i++) {
-        const img = new Image();
-        img.src = frames[i];
-      }
-    }
-  }, [frameIndex, frames]);
-
-  // Virtualization window
-  const windowSize = isMobile ? 5 : 2; 
-  const visibleFrames = frames.map((src, index) => {
-    const isVisible = Math.abs(index - frameIndex) <= windowSize;
-    if (!isVisible) return null;
-
-    const isActive = index === frameIndex;
-    const isNeighbor = Math.abs(index - frameIndex) === 1;
-
-    return (
-      <img
-        key={src}
-        src={src}
-        alt={`Hero Frame ${index + 1}`}
-        className={`absolute inset-0 w-full h-full object-cover`}
-        // @ts-ignore
-        fetchPriority={isActive ? 'high' : 'auto'}
-        style={{ 
-          opacity: (isActive || isNeighbor) ? 1 : 0, 
-          zIndex: isActive ? 10 : (isNeighbor ? 5 : 0), 
-          transition: isMobile ? 'none' : 'opacity 50ms linear',
-          objectPosition: isMobile ? '50% 35%' : 'center center',
-          transform: `translateZ(0) ${isMobile ? 'scale(1.05)' : ''}`,
-        }}
-        onError={(e) => {
-          (e.target as HTMLImageElement).style.display = 'none';
-        }}
-      />
-    );
-  });
+    const interval = setInterval(tick, 200);
+    return () => {
+      clearInterval(interval);
+      cancelAnimationFrame(reverseId);
+    };
+  }, [isVisible, isMobile]);
 
   return (
-    <div 
-      ref={containerRef} 
-      className={`relative w-full bg-black ${isMobile ? 'h-[750vh]' : 'h-[350vh]'}`}
-    >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        
-        {/* Background Frames - Virtualized */}
-        {visibleFrames}
-        
-        {/* Content Overlay - with dynamic fade-out */}
-        <div 
-          className="absolute inset-0 z-20 flex items-center"
-          style={{ 
-            opacity: overlayOpacity,
-            visibility: overlayOpacity === 0 ? 'hidden' : 'visible',
-            transition: 'opacity 50ms linear'
-          }}
-        >
+    <div ref={containerRef} className="relative w-full h-screen">
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
+
+        {/* ── Desktop: MP4 ping-pong ── */}
+        {!isMobile && (
+          <video
+            ref={videoRef}
+            src="/House_exterior_to_202603291831.mp4"
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ opacity: heroVisible ? 1 : 0, transition: 'opacity 1s' }}
+            onLoadedData={() => setHeroVisible(true)}
+          />
+        )}
+
+        {/* ── Mobile: static placeholder → GIF once fully preloaded ── */}
+        {isMobile && (
+          <div className="absolute inset-0 w-full h-full">
+            {/* Placeholder (frame 1) — visible instantly, fades out when GIF is ready */}
+            <img
+              src={MOBILE_PLACEHOLDER}
+              alt=""
+              aria-hidden="true"
+              fetchPriority="high"
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                opacity: gifReady ? 0 : 1,
+                transition: 'opacity 0.5s ease',
+                pointerEvents: 'none',
+              }}
+            />
+            {/* GIF only mounted after full download — always starts at frame 1 */}
+            {gifReady && (
+              <img
+                src={MOBILE_GIF}
+                alt="Hero animation"
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ pointerEvents: 'none' }}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Cinematic overlays */}
+        <div className="absolute inset-0 z-[15] bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+        <div className="absolute inset-0 z-[15] bg-gradient-to-t from-black/40 to-transparent" />
+
+        {/* Text + CTA */}
+        <div className="absolute inset-0 z-20 flex items-center">
           <div className="container mx-auto px-6">
-            <div className="max-w-3xl text-center md:text-left pt-24">
-              <h1 className="font-headline text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tighter drop-shadow-lg">
+            <div
+              className={`max-w-3xl text-center md:text-left pt-24 transition-all duration-1000 transform ${
+                heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+            >
+              <h1 className="font-headline text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tighter drop-shadow-xl">
                 {headline}
               </h1>
-              <p className="text-xl text-white font-medium mb-10 max-w-2xl leading-relaxed drop-shadow-md">
+              <p className="text-xl text-white font-medium mb-10 max-w-2xl leading-relaxed drop-shadow-lg">
                 {subheadline}
               </p>
               <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
-                <a 
-                  href={primaryCta.href} 
-                  className="bg-primary-container text-on-primary px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl text-center"
+                <a
+                  href={primaryCta.href}
+                  className="bg-primary-container text-on-primary px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-2xl text-center"
                 >
                   {primaryCta.label}
                 </a>
-                <a 
-                  href={secondaryCta.href} 
+                <a
+                  href={secondaryCta.href}
                   className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-10 py-5 rounded-full font-bold text-lg hover:bg-white/20 transition-all text-center"
                 >
                   {secondaryCta.label}
