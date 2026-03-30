@@ -17,7 +17,7 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [heroVisible, setHeroVisible] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
 
   // Responsive check
@@ -27,11 +27,6 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
-
-  // Mobile: show content overlay immediately
-  useEffect(() => {
-    if (isMobile) setHeroVisible(true);
-  }, [isMobile]);
 
   // Visibility tracking
   useEffect(() => {
@@ -76,18 +71,21 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
 
   return (
     <div ref={containerRef} className="relative w-full h-screen">
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-[#0c2d48]">
 
         {/* Desktop: MP4 ping-pong */}
         {!isMobile && (
           <video
             ref={videoRef}
             src="/House_exterior_to_202603291831.mp4"
+            autoPlay
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ opacity: heroVisible ? 1 : 0, transition: 'opacity 1s' }}
-            onLoadedData={() => setHeroVisible(true)}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000"
+            style={{ opacity: videoLoaded ? 1 : 0 }}
+            onLoadedData={() => setVideoLoaded(true)}
+            onCanPlay={() => setVideoLoaded(true)}
+            onError={() => setVideoLoaded(false)}
           />
         )}
 
@@ -106,14 +104,10 @@ export const HeroScrollMotion: React.FC<HeroScrollMotionProps> = ({
         <div className="absolute inset-0 z-[15] bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
         <div className="absolute inset-0 z-[15] bg-gradient-to-t from-black/40 to-transparent" />
 
-        {/* Text + CTA */}
+        {/* Text + CTA — always visible, no dependency on video load */}
         <div className="absolute inset-0 z-20 flex items-center">
           <div className="container mx-auto px-6">
-            <div
-              className={`max-w-3xl text-center md:text-left pt-24 transition-all duration-1000 transform ${
-                heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
+            <div className="max-w-3xl text-center md:text-left pt-24 animate-[fadeUp_0.8s_ease_0.2s_both]">
               <h1 className="font-headline text-5xl md:text-7xl font-extrabold text-white leading-[1.1] mb-8 tracking-tighter drop-shadow-xl">
                 {headline}
               </h1>

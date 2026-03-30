@@ -1,89 +1,115 @@
 'use client';
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { properties } from '@/data/properties';
 
 export default function GalleryPage() {
   const [filter, setFilter] = useState('Todos');
 
-  const categories = ['Todos', 'Moradias', 'Apartamentos', 'Terrenos', 'Comercial'];
-  
-  const properties = [
-    { id: 1, title: 'Moradia T4 Minimalista', cat: 'Moradias', price: '650.000€', loc: 'Famalicão', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCug8VOrKRAhPUhloGqHBmoW4t55XPC_fcBWh88rvW-vYtGi0FusP0tGOfVqKEfBWTgoPcy7zOKTHzlyCXHqADdxtnbacWKkor157isYIcT2ky93z9YIEihb-6Mf30vQG22VKyMiehhbF2gq2aNubhb2i4WttGW-bnLEJqkX_-h6ZPo9SAiu3Y0f-I-SrcAEE0SGgYJ0612rTuErmEIQBArwFyYR2kl71AtSbywQo95BxdNiPSvYiXYh42oFY1Zy8q4bSGxRpvlKwnn' },
-    { id: 2, title: 'Apartamento Luxo T3', cat: 'Apartamentos', price: '325.000€', loc: 'Centro', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBsmrGCOu4jkmrCUifjQf5g0TNzgm0K0frgPZcmkouVIvDdb5E-BcN4_crWyX6r9LGsVQc1iTNB-0QqN4wliBb4b2YnZCtSIshrVur-5LQtzknnJn_GIM2u-r088J4GM155u4-v6Ow6QZuulM8av_9tetebG4vv_QcLMkmda-jJ9st_4iVd0BNYx51AiGbqm9jooHGmzP1RvFc2tw7pZmnALM-xD8QPj_TAwAoD7Nz7Bdl8sTAd0RZ5G9OaRuDlUUIgzpEhMgOHdEF_' },
-    { id: 3, title: 'Casa de Campo Renovada', cat: 'Moradias', price: '420.000€', loc: 'Gavião', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC10reTxqjYCvIqgwtHiAsr94nIBkFZiThJWWcjiysUoYhksaPNmo-bBHXDNQv3bHs8VQJnLZjg5DPKNmOdCCAgVDIy4VllVri6RaovatzJfQGq4Ra3BJ_ofn0lUo0vlaTzs0k5hyuy5RMsi7wPpZ6jjrdc7rAgKdxpr_9y5wf_MIKfHKMxDW1ovYlmJzJey8WYUmnaxjHhTEn-XntAzBQpvtDuhjPFQmtSmv9ImXhGpcTNsRFWFWd3PRgAs0Kfk_mk0WMgG12qDXCL' },
-    { id: 4, title: 'Terreno Urbanizável', cat: 'Terrenos', price: '125.000€', loc: 'Antas', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB9Ym9_8l8BqX6yv_2o_pIu_zX4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c0' },
-    { id: 5, title: 'Escritório Moderno', cat: 'Comercial', price: '185.000€', loc: 'Centro', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB9Ym9_8l8BqX6yv_2o_pIu_zX4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c00S9Y6b5X7LpJ2LqX8c2o_zY4_c7c0' },
-    { id: 6, title: 'Moradia T3 Luxo', cat: 'Moradias', price: '540.000€', loc: 'Famalicão', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCug8VOrKRAhPUhloGqHBmoW4t55XPC_fcBWh88rvW-vYtGi0FusP0tGOfVqKEfBWTgoPcy7zOKTHzlyCXHqADdxtnbacWKkor157isYIcT2ky93z9YIEihb-6Mf30vQG22VKyMiehhbF2gq2aNubhb2i4WttGW-bnLEJqkX_-h6ZPo9SAiu3Y0f-I-SrcAEE0SGgYJ0612rTuErmEIQBArwFyYR2kl71AtSbywQo95BxdNiPSvYiXYh42oFY1Zy8q4bSGxRpvlKwnn' },
-  ];
+  const filteredProperties = filter === 'Todos' 
+    ? properties 
+    : properties.filter(p => p.category === filter);
 
-  const filtered = filter === 'Todos' ? properties : properties.filter(p => p.cat === filter);
+  const categories = ['Todos', 'Moradias', 'Apartamentos', 'Terrenos', 'Comercial'];
 
   return (
-    <main className="min-h-screen pt-32 pb-24 bg-surface">
+    <main className="min-h-screen bg-surface">
       <Navbar />
       
-      <div className="container mx-auto px-6">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <h1 className="font-headline text-5xl md:text-6xl font-extrabold text-primary-container mb-6">Nosso Portfólio</h1>
-          <p className="text-xl text-on-surface-variant font-medium">Explore as nossas propriedades exclusivas em Vila Nova de Famalicão.</p>
+      {/* Header */}
+      <section className="pt-40 pb-20 bg-surface-container-low">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl">
+            <span className="text-on-tertiary-container font-bold tracking-widest uppercase text-xs">O NOSSO PORTFÓLIO</span>
+            <h1 className="font-headline text-5xl md:text-7xl font-extrabold text-primary-container mt-4 leading-tight">
+              Descubra o seu próximo <span className="text-secondary">investimento</span>
+            </h1>
+            <p className="text-on-surface-variant text-xl mt-6 font-medium leading-relaxed">
+              Explore a nossa seleção exclusiva de propriedades, desde moradias minimalistas a terrenos com potencial ilimitado.
+            </p>
+          </div>
         </div>
+      </section>
 
-        {/* Filters */}
-        <div className="flex flex-wrap justify-center gap-4 mb-16">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-8 py-3 rounded-full font-bold transition-all duration-300 ${
-                filter === cat 
-                  ? 'bg-primary-container text-on-primary shadow-lg scale-105' 
-                  : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+      {/* Filter Bar */}
+      <section className="sticky top-20 z-30 bg-surface/80 backdrop-blur-xl border-y border-surface-container-high py-6 shadow-sm">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setFilter(cat)}
+                className={`px-8 py-3 rounded-full text-sm font-bold transition-all duration-300 border ${
+                  filter === cat 
+                  ? 'bg-primary-container text-on-primary border-primary-container shadow-lg' 
+                  : 'bg-transparent text-primary-container border-primary-container/20 hover:border-primary-container'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
+      </section>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {filtered.map((prop) => (
-            <div key={prop.id} className="group bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-white/50">
-              <div className="relative h-72 overflow-hidden">
-                <Image 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                  src={prop.img} 
-                  alt={prop.title} 
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  quality={90}
-                />
-              </div>
-              <div className="p-8">
-                <div className="mb-4">
-                  <span className="text-secondary font-bold text-xs uppercase tracking-widest">{prop.cat}</span>
-                  <h3 className="text-xl font-extrabold text-primary-container mt-1">{prop.title}</h3>
-                  <p className="text-on-surface-variant text-sm flex items-center gap-1 mt-1">
-                    <span className="material-symbols-outlined text-base">location_on</span> {prop.loc}
-                  </p>
+      {/* Grid */}
+      <section className="py-20">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            {filteredProperties.map((prop) => (
+              <div key={prop.id} className="group bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-700 hover:-translate-y-2 border border-surface-container-high">
+                <Link href={`/properties/${prop.id}`}>
+                  <div className="relative h-80 overflow-hidden">
+                    <Image 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                      src={prop.mainImage} 
+                      alt={prop.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      quality={90}
+                    />
+                    <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                      <span className={`inline-block ${prop.statusColor} text-white px-5 py-2 rounded-full text-xs font-black shadow-lg uppercase tracking-widest`}>
+                        {prop.status}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+                <div className="p-8">
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-4">
+                      <div className="flex-1 min-w-0 mr-0 sm:mr-4">
+                        <span className="text-[10px] font-black text-secondary tracking-[0.2em] uppercase">{prop.category}</span>
+                        <h3 className="text-2xl font-black text-primary-container mt-1 truncate leading-tight">{prop.title}</h3>
+                      </div>
+                      <span className="text-xl sm:text-2xl font-black text-primary-container whitespace-nowrap leading-none py-1">{prop.price}</span>
+                    </div>
+                    <p className="text-on-surface-variant font-medium flex items-center gap-2">
+                      <span className="material-symbols-outlined text-sm">location_on</span> {prop.location}
+                    </p>
+                    <div className="flex gap-6 py-6 border-y border-surface-container-high text-on-surface-variant font-bold text-sm">
+                      <span className="flex items-center gap-2"><span className="material-symbols-outlined text-primary-container">bed</span> {prop.beds}</span>
+                      <span className="flex items-center gap-2"><span className="material-symbols-outlined text-primary-container">bathtub</span> {prop.baths}</span>
+                      <span className="flex items-center gap-2"><span className="material-symbols-outlined text-primary-container">square_foot</span> {prop.area}</span>
+                    </div>
+                    <Link 
+                      href={`/properties/${prop.id}`}
+                      className="flex items-center justify-center w-full py-5 rounded-full bg-surface-container-high text-primary-container font-black hover:bg-primary-container hover:text-white transition-all duration-300 uppercase tracking-widest text-sm"
+                    >
+                      Explorar Imóvel
+                    </Link>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center pt-4 border-t border-surface-variant">
-                  <span className="text-2xl font-black text-primary-container">{prop.price}</span>
-                  <button className="text-primary-container font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Ver mais <span className="material-symbols-outlined">arrow_forward</span>
-                  </button>
-                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="mt-24">
-        <Footer />
-      </div>
+      <Footer />
     </main>
   );
 }

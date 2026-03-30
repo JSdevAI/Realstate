@@ -9,7 +9,7 @@ export const AboutSection = () => {
             <div className="absolute -top-6 -left-6 w-32 h-32 bg-tertiary-fixed-dim rounded-full mix-blend-multiply opacity-20 filter blur-3xl"></div>
             <Image 
               className="rounded-lg shadow-2xl relative z-10 w-full object-cover aspect-[4/5]" 
-              src="/photo_andré_studio.png" 
+              src="/photo_andré_studio_v2.png" 
               alt="André Araújo" 
               width={600}
               height={750}
