@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { ContactForm } from '../common/ContactForm';
 
 export const ContactSection = () => {
   return (
@@ -8,18 +9,17 @@ export const ContactSection = () => {
           <div className="w-full lg:w-4/12 space-y-10">
             <div className="space-y-6">
               <span className="text-on-tertiary-container font-bold tracking-widest uppercase text-xs">VAMOS CONVERSAR?</span>
-              <div className="flex items-center gap-6">
-                <div className="relative w-24 h-24 rounded-2xl overflow-hidden shadow-2xl ring-4 ring-primary-container/10">
-                  <Image 
-                    src="/photo_andré_studio.png" 
-                    alt="André Araújo" 
-                    fill 
-                    className="object-cover"
-                  />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-extrabold text-primary-container leading-none">André Araújo</h3>
-                  <p className="text-on-surface-variant font-bold text-sm mt-2 opacity-70">Consultor Imobiliário</p>
+              <div className="relative w-full aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl ring-4 ring-primary-container/10">
+                <Image
+                  src="/photo_andré_studio_v2.png"
+                  alt="André Araújo"
+                  fill
+                  className="object-cover object-top"
+                  priority
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-6 py-5">
+                  <h3 className="text-xl font-extrabold text-white leading-none">André Araújo</h3>
+                  <p className="text-white/70 font-bold text-sm mt-1">Consultor Imobiliário</p>
                 </div>
               </div>
               <h2 className="font-headline text-4xl font-extrabold text-primary-container leading-tight">Precisa de ajuda com o seu imóvel?</h2>
@@ -27,6 +27,7 @@ export const ContactSection = () => {
                 Estou aqui para simplificar o seu processo imobiliário. Conte-me como o posso ajudar.
               </p>
             </div>
+            {/* Contact Items ... */}
             <div className="space-y-6">
               <div className="flex items-center gap-6 group">
                 <div className="w-14 h-14 bg-surface-container-high rounded-full flex items-center justify-center group-hover:bg-primary-container group-hover:text-white transition-all duration-300">
@@ -58,40 +59,7 @@ export const ContactSection = () => {
             </div>
           </div>
           <div className="w-full lg:w-8/12 bg-surface-container-lowest p-10 lg:p-14 rounded-3xl shadow-2xl shadow-primary-container/5 border border-white/50">
-            <form className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <label className="text-sm font-bold text-primary-container uppercase tracking-wider ml-1">Nome Completo</label>
-                  <input type="text" placeholder="João Silva" className="w-full px-6 py-4 rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container outline-none text-on-surface placeholder:text-outline/50 font-medium" />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-sm font-bold text-primary-container uppercase tracking-wider ml-1">Email</label>
-                  <input type="email" placeholder="joao@email.com" className="w-full px-6 py-4 rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container outline-none text-on-surface placeholder:text-outline/50 font-medium" />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <label className="text-sm font-bold text-primary-container uppercase tracking-wider ml-1">Telefone</label>
-                  <input type="tel" placeholder="+351 900 000 000" className="w-full px-6 py-4 rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container outline-none text-on-surface placeholder:text-outline/50 font-medium" />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-sm font-bold text-primary-container uppercase tracking-wider ml-1">Tipo de Imóvel</label>
-                  <select className="w-full px-6 py-4 rounded-full bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container outline-none text-on-surface appearance-none font-medium">
-                    <option>Moradia</option>
-                    <option>Apartamento</option>
-                    <option>Terreno</option>
-                    <option>Outro</option>
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <label className="text-sm font-bold text-primary-container uppercase tracking-wider ml-1">Mensagem</label>
-                <textarea rows={4} placeholder="Como podemos ajudar?" className="w-full px-8 py-6 rounded-[2rem] bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container outline-none text-on-surface placeholder:text-outline/50 font-medium resize-none"></textarea>
-              </div>
-              <button className="w-full bg-primary-container text-on-primary py-5 rounded-full font-bold text-lg hover:bg-primary transition-all shadow-xl shadow-primary-container/20 uppercase tracking-widest">
-                Enviar Mensagem
-              </button>
-            </form>
+            <ContactForm />
           </div>
         </div>
       </div>
